@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class JdbcDao {
+    public static final String SELECT_QUERY_TEMPLATE = "select * from %s where %s = ?";
     private final String url;
     private final String user;
     private final String password;
@@ -23,8 +24,7 @@ public class JdbcDao {
     }
 
     public <R, T> R getById(Class<R> clazz, T id) {
-        EntityUtil entityUtil = new EntityUtil();
-        Pair pair = entityUtil.processEntity(clazz, id);
+        Pair pair = EntityUtil.processEntity(clazz, id);
         R result = sendRequest(pair, id, clazz);
         if (result == null) {
             throw new EntityNotFoundException("Can't find entity of class '%s' by id '%s'"
@@ -33,9 +33,8 @@ public class JdbcDao {
         return result;
     }
 
-    @SneakyThrows
     public <T, R> R sendRequest(Pair pair, T id, Class<R> clazz) {
-        String selectQuery = "select * from %s where %s = ?".formatted(pair.tableName(), pair.idFieldName());
+        String selectQuery = SELECT_QUERY_TEMPLATE.formatted(pair.tableName(), pair.idFieldName());
         Object entity = null;
         try (var connection = getConnection()) {
             try (var statement = connection.prepareStatement(selectQuery)) {

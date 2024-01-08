@@ -5,12 +5,14 @@ import demo.annotation.Entity;
 import demo.annotation.Id;
 import demo.annotation.Table;
 import demo.exception.MissingAnnotationException;
+import lombok.experimental.UtilityClass;
 import java.lang.reflect.Field;
 
+@UtilityClass
 public class EntityUtil {
 
 
-    public <T> Pair processEntity (Class<?> clazz, T id) {
+    public static  <T> Pair processEntity (Class<?> clazz, T id) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
            throw new MissingAnnotationException("The class '%s' is not annotated with Entity annotation"
                    .formatted(clazz.getSimpleName()));
@@ -21,7 +23,7 @@ public class EntityUtil {
         return new Pair(tableName, idFieldName);
     }
 
-    private <T> String getIdFieldName(Class<?> clazz, T id) {
+    private static  <T> String getIdFieldName(Class<?> clazz, T id) {
         String idFieldName = null;
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {
@@ -52,7 +54,7 @@ public class EntityUtil {
         }
     }
 
-    private String getTableName(Class<?> clazz) {
+    private static String getTableName(Class<?> clazz) {
         String tableName;
         if (clazz.isAnnotationPresent(Table.class)) {
             Table annotation = clazz.getAnnotation(Table.class);
