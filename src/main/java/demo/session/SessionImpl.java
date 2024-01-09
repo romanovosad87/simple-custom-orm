@@ -11,12 +11,12 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class SessionImpl implements Session {
-    private final Map<EntityKey<?>, Object> entityKeyObjectMap = new HashMap<>();
+    private final Map<EntityKey, Object> entityKeyObjectMap = new HashMap<>();
 
     private final JdbcDao jdbcDao;
     @Override
-    public <R, T> R getById(Class<R> clazz, T id) {
-        EntityKey<T> entityKey = getEntityKey(clazz, id);
+    public <R> R getById(Class<R> clazz, Object id) {
+        EntityKey entityKey = getEntityKey(clazz, id);
         Object cachedEntity = entityKeyObjectMap.get(entityKey);
         if (cachedEntity == null) {
             R loadedEntity = jdbcDao.getById(clazz, id);

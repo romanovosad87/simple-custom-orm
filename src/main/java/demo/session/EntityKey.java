@@ -5,10 +5,10 @@ import java.lang.reflect.Type;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-public class EntityKey<T> {
+public class EntityKey {
     private final String entityName;
     private final String entityKeyName;
-    private final T key;
+    private final Object key;
     private final Type keyType;
 
     @Override
@@ -19,7 +19,7 @@ public class EntityKey<T> {
         if (o == null || !o.getClass().equals(this.getClass())) {
             return false;
         }
-        EntityKey<?> entityKey = (EntityKey<?>) o;
+        EntityKey entityKey = (EntityKey) o;
         return Objects.equals(entityName, entityKey.entityName)
                 && Objects.equals(entityKeyName, entityKey.entityKeyName)
                 && Objects.equals(keyType, entityKey.keyType);

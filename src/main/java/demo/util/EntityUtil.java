@@ -13,7 +13,7 @@ import java.lang.reflect.Type;
 @UtilityClass
 public class EntityUtil {
 
-    public static <T> EntityKey<T> getEntityKey(Class<?> clazz, T id) {
+    public static EntityKey getEntityKey(Class<?> clazz, Object id) {
         String entityName = clazz.getSimpleName();
         String keyName;
         Type keyType;
@@ -22,7 +22,7 @@ public class EntityUtil {
             if (field.isAnnotationPresent(Id.class)) {
                 keyName = field.getName();
                 keyType = field.getType();
-                return new EntityKey<>(entityName, keyName, id, keyType);
+                return new EntityKey(entityName, keyName, id, keyType);
             }
         }
         throw new MissingAnnotationException("The class '%s' doesn't have field annotated with @Id annotation"
