@@ -31,9 +31,9 @@ public class JdbcDao {
         this.password = properties.getProperty(DB_PASSWORD);
     }
 
-    public <R, T> R getById(Class<R> clazz, T id) {
-        Pair pair = EntityUtil.processEntity(clazz, id);
-        R result = sendRequest(pair, id, clazz);
+    public <R> R getById(Class<R> clazz, Object id) {
+        Pair pair = EntityUtil.processEntity(clazz);
+        R result = sendRequest(pair, clazz, id);
         if (result == null) {
             throw new EntityNotFoundException("Can't find entity of class '%s' by id '%s'"
                     .formatted(clazz.getSimpleName(), id));
@@ -41,7 +41,7 @@ public class JdbcDao {
         return result;
     }
 
-    public <T, R> R sendRequest(Pair pair, T id, Class<R> clazz) {
+    public <R> R sendRequest(Pair pair, Class<R> clazz, Object id) {
         String selectQuery = SELECT_QUERY_TEMPLATE.formatted(pair.tableName(), pair.idFieldName());
         Object entity = null;
         try (var connection = getConnection()) {
