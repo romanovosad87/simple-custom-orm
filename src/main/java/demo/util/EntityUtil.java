@@ -14,14 +14,12 @@ import java.lang.reflect.Type;
 public class EntityUtil {
 
     public static <T> EntityKey<T> getEntityKey(Class<?> clazz, T id) {
-        checkIfClassHasEntityAnnotation(clazz);
         String entityName = clazz.getSimpleName();
         String keyName;
         Type keyType;
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field: declaredFields) {
             if (field.isAnnotationPresent(Id.class)) {
-                checkIfParameterIdTypeCorrespondsEntityIdType(id, field);
                 keyName = field.getName();
                 keyType = field.getType();
                 return new EntityKey<>(entityName, keyName, id, keyType);
@@ -32,11 +30,11 @@ public class EntityUtil {
     }
 
 
-    public static  <T> Pair processEntity (Class<?> clazz, T id) {
+    public static Pair processEntity (Class<?> clazz) {
         checkIfClassHasEntityAnnotation(clazz);
 
         String tableName = getTableName(clazz);
-        String idFieldName = getIdFieldName(clazz, id);
+        String idFieldName = getIdFieldName(clazz);
         return new Pair(tableName, idFieldName);
     }
 
@@ -47,12 +45,11 @@ public class EntityUtil {
         }
     }
 
-    private static  <T> String getIdFieldName(Class<?> clazz, T id) {
+    private static String getIdFieldName(Class<?> clazz) {
         String idFieldName = null;
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {
             if (field.isAnnotationPresent(Id.class)) {
-                checkIfParameterIdTypeCorrespondsEntityIdType(id, field);
                 if (field.isAnnotationPresent(Column.class)) {
                     Column annotation = field.getAnnotation(Column.class);
                     idFieldName = annotation.name();
@@ -68,14 +65,6 @@ public class EntityUtil {
                     .formatted(clazz.getSimpleName()));
         }
         return idFieldName;
-    }
-
-    private static <T> void checkIfParameterIdTypeCorrespondsEntityIdType(T id, Field field) {
-        if (!field.getType().equals(id.getClass())) {
-            throw new MissingAnnotationException(("Parameter type '%s' do not match to the "
-                    + "type of id field '%s' in Entity class")
-                    .formatted(id.getClass().getSimpleName(), field.getType().getSimpleName()));
-        }
     }
 
     private static String getTableName(Class<?> clazz) {
