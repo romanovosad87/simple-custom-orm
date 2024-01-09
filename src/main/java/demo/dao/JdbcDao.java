@@ -2,25 +2,33 @@ package demo.dao;
 
 import demo.exception.ConnectionFailedException;
 import demo.exception.EntityNotFoundException;
+import demo.exception.FailingReadPropertiesException;
 import demo.util.EntityUtil;
 import demo.util.Pair;
-import lombok.SneakyThrows;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class JdbcDao {
     public static final String SELECT_QUERY_TEMPLATE = "select * from %s where %s = ?";
+    public static final String APPLICATION_PROPERTIES = "application.properties";
+    public static final String DB_URL = "db.url";
+    public static final String DB_USER = "db.user";
+    public static final String DB_PASSWORD = "db.password";
     private final String url;
     private final String user;
     private final String password;
     private final ResultSetParser resultSetParser = new ResultSetParser();
 
-    public JdbcDao(String url, String user, String password) {
-        this.url = url;
-        this.user = user;
-        this.password = password;
+    public JdbcDao() {
+        Properties properties = getProperties();
+        this.url = properties.getProperty(DB_URL);
+        this.user = properties.getProperty(DB_USER);
+        this.password = properties.getProperty(DB_PASSWORD);
     }
 
     public <R, T> R getById(Class<R> clazz, T id) {
@@ -59,5 +67,17 @@ public class JdbcDao {
             throw new ConnectionFailedException("Can't get connection", e);
         }
         return connection;
+    }
+
+    private Properties getProperties() {
+        Properties properties = new Properties();
+        InputStream stream = JdbcDao.class.getClassLoader().getResourceAsStream(APPLICATION_PROPERTIES);
+        try {
+            properties.load(stream);
+        } catch (IOException e) {
+            throw new FailingReadPropertiesException("Can't read properties from file: '%s'"
+                    .formatted(APPLICATION_PROPERTIES), e);
+        }
+        return properties;
     }
 }

@@ -5,22 +5,46 @@ import demo.annotation.Entity;
 import demo.annotation.Id;
 import demo.annotation.Table;
 import demo.exception.MissingAnnotationException;
+import demo.session.EntityKey;
 import lombok.experimental.UtilityClass;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 @UtilityClass
 public class EntityUtil {
 
+    public static <T> EntityKey<T> getEntityKey(Class<?> clazz, T id) {
+        checkIfClassHasEntityAnnotation(clazz);
+        String entityName = clazz.getSimpleName();
+        String keyName;
+        Type keyType;
+        Field[] declaredFields = clazz.getDeclaredFields();
+        for (Field field: declaredFields) {
+            if (field.isAnnotationPresent(Id.class)) {
+                checkIfParameterIdTypeCorrespondsEntityIdType(id, field);
+                keyName = field.getName();
+                keyType = field.getType();
+                return new EntityKey<>(entityName, keyName, id, keyType);
+            }
+        }
+        throw new MissingAnnotationException("The class '%s' doesn't have field annotated with @Id annotation"
+                .formatted(clazz.getSimpleName()));
+    }
+
 
     public static  <T> Pair processEntity (Class<?> clazz, T id) {
-        if (!clazz.isAnnotationPresent(Entity.class)) {
-           throw new MissingAnnotationException("The class '%s' is not annotated with Entity annotation"
-                   .formatted(clazz.getSimpleName()));
-        }
+        checkIfClassHasEntityAnnotation(clazz);
 
         String tableName = getTableName(clazz);
         String idFieldName = getIdFieldName(clazz, id);
         return new Pair(tableName, idFieldName);
+    }
+
+    private static void checkIfClassHasEntityAnnotation(Class<?> clazz) {
+        if (!clazz.isAnnotationPresent(Entity.class)) {
+           throw new MissingAnnotationException("The class '%s' is not annotated with Entity annotation"
+                   .formatted(clazz.getSimpleName()));
+        }
     }
 
     private static  <T> String getIdFieldName(Class<?> clazz, T id) {
@@ -64,5 +88,4 @@ public class EntityUtil {
         }
         return tableName;
     }
-
 }
