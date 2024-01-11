@@ -15,11 +15,13 @@ public class DemoApp {
         JdbcDao jdbcDao = new JdbcDao();
         SessionFactory sessionFactory = new SessionFactory(jdbcDao);
         try (Session session = sessionFactory.getSession()) {
-            Person person1 = session.getById(Person.class, 1L);
-            Person person2 = session.getById(Person.class, 1f);
-            log.info("Entity from first call of find by id: {}", person1);
-            log.info("Entity from second call of find by id: {}", person2);
-            log.info("{}", person1 == person2);
+            Person martin = session.getById(Person.class, 1L);
+            Person joshua = session.getById(Person.class, 2L);
+            log.info("Person from DB: {}", martin);
+            log.info("Person from DB: {}", joshua);
+
+            martin.setLastName("Fowler Super");
+            joshua.setAge(60);
         }
         sessionFactory.close();
     }

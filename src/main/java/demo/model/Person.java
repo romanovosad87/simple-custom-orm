@@ -4,11 +4,15 @@ import demo.annotation.Column;
 import demo.annotation.Entity;
 import demo.annotation.Id;
 import demo.annotation.Table;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "persons")
 @ToString
+@Setter
+@Getter
 public class Person {
     @Id
     @Column(name = "id")
