@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 public class PropertyParser {
     private static final String PATTERN = "\\$\\{(.*?)}";
     private static final String PREFIX = "$";
+    private static final Pattern COMPILE_PARAM = Pattern.compile(PATTERN);
 
     public static String processProperty(String propertyValue) {
         if (propertyValue.startsWith(PREFIX)) {
@@ -18,8 +19,8 @@ public class PropertyParser {
     }
 
     private static String getEnvValue(String propertyValue) {
-        Pattern pattern = Pattern.compile(PATTERN);
-        Matcher matcher = pattern.matcher(propertyValue);
+
+        Matcher matcher = COMPILE_PARAM.matcher(propertyValue);
 
         if (matcher.find()) {
             String key = matcher.group(1);
