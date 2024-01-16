@@ -1,15 +1,17 @@
 package demo.session;
 
 import demo.dao.JdbcDao;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.io.Closeable;
 
 @Slf4j
-@RequiredArgsConstructor
 public class SessionFactory implements Closeable {
 
     private final JdbcDao jdbcDao;
+
+    public SessionFactory(JdbcDao jdbcDao) {
+        this.jdbcDao = jdbcDao;
+    }
 
     public Session getSession() {
         return new SessionImpl(jdbcDao);
@@ -17,6 +19,7 @@ public class SessionFactory implements Closeable {
 
     @Override
     public void close() {
+        jdbcDao.close();
         log.info("SessionFactory is closing");
     }
 }

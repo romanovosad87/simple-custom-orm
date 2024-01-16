@@ -15,7 +15,6 @@ import java.util.Map;
 public class SessionImpl implements Session {
     private final Map<EntityKey, Object> entityKeyToObject = new HashMap<>();
     private final Map<EntityKey, Object[]> snapshots = new HashMap<>();
-
     private final JdbcDao jdbcDao;
     @Override
     public <R> R getById(Class<R> clazz, Object id) {
